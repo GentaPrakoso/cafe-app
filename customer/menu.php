@@ -12,17 +12,19 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu - Café Modern</title>
-    <!-- Pastikan path CSS benar -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* ========== Tambahan / Override Style ========== */
+        body {
+            background: linear-gradient(180deg, #fcf9f5 0%, #fff 100%);
+        }
+
         .menu-page {
-            padding: 2rem 0;
+            padding: 6rem 0 4rem;
         }
 
         .filter-container {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -30,50 +32,56 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         }
 
         .search-input {
-            padding: 10px 15px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid #ddd;
             flex: 1;
             min-width: 200px;
+            background: white;
         }
 
         .category-filters {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 8px;
         }
 
         .filter-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--primary);
+            padding: 8px 18px;
+            border-radius: 50px;
+            border: none;
             background: white;
             color: var(--primary);
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         .filter-btn.active {
-            background: var(--primary);
+            background: var(--gold);
             color: white;
         }
 
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 25px;
         }
 
         .menu-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
             overflow: hidden;
-            transition: transform 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: var(--transition);
         }
 
         .menu-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            border-color: var(--gold);
         }
 
         .menu-card img {
@@ -83,12 +91,13 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         }
 
         .menu-card .info {
-            padding: 15px;
+            padding: 20px;
         }
 
         .menu-card h3 {
-            margin-bottom: 5px;
+            font-weight: 700;
             color: var(--primary);
+            margin-bottom: 5px;
         }
 
         .menu-card p {
@@ -99,10 +108,10 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
 
         .price {
             font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--primary);
+            font-size: 1.3rem;
+            color: var(--gold);
             display: block;
-            margin-bottom: 8px;
+            margin: 8px 0;
         }
 
         .status {
@@ -111,6 +120,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             font-size: 0.75rem;
             font-weight: 600;
             display: inline-block;
+            margin-bottom: 10px;
         }
 
         .status.tersedia {
@@ -127,16 +137,18 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
-            transition: 0.2s;
+            font-weight: 600;
+            transition: 0.3s;
         }
 
         .btn-tambah:hover {
-            background: #5a3e2b;
+            background: var(--gold);
+            color: var(--primary);
         }
 
         .btn-tambah:disabled {
@@ -144,7 +156,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             cursor: not-allowed;
         }
 
-        /* ========== Modal ========== */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -164,7 +176,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
 
         .modal-content {
             background: white;
-            border-radius: 16px;
+            border-radius: 32px;
             padding: 2rem;
             width: 90%;
             max-width: 420px;
@@ -174,9 +186,9 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
 
         .modal-close {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 1.5rem;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
             cursor: pointer;
             color: #666;
         }
@@ -190,7 +202,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             width: 100%;
             height: 180px;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 16px;
             margin-bottom: 1rem;
         }
 
@@ -214,8 +226,8 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             display: flex;
             align-items: center;
             gap: 5px;
-            background: #f5f5f5;
-            padding: 5px 12px;
+            background: #f9f9f9;
+            padding: 5px 14px;
             border-radius: 20px;
             cursor: pointer;
             user-select: none;
@@ -228,7 +240,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         .qty-selector {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             margin: 10px 0;
         }
 
@@ -246,7 +258,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         #modal-catatan {
             width: 100%;
             padding: 8px;
-            border-radius: 8px;
+            border-radius: 12px;
             border: 1px solid #ccc;
             margin-top: 5px;
         }
@@ -257,7 +269,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             border: none;
             padding: 12px;
             width: 100%;
-            border-radius: 10px;
+            border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 15px;
@@ -267,7 +279,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             background: #5a3e2b;
         }
 
-        /* ========== Floating Cart ========== */
+        /* Floating Cart */
         .floating-cart {
             position: fixed;
             bottom: 25px;
@@ -285,7 +297,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             cursor: pointer;
             z-index: 1500;
             text-decoration: none;
-            transition: transform 0.2s;
+            transition: transform 0.3s;
         }
 
         .floating-cart.show {
@@ -311,20 +323,35 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             justify-content: center;
             font-weight: bold;
         }
+
+        /* Customer info di navbar */
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .navbar.scrolled .customer-info {
+            color: var(--primary);
+        }
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
+    <nav class="navbar" id="navbar">
         <div class="container">
             <a href="index.php" class="logo">☕ Café Modern</a>
             <ul class="nav-links" id="nav-links">
-                <li><a href="index.php">Home</a></li>
                 <li><a href="menu.php" class="active">Menu</a></li>
                 <li><a href="cart.php">🛒 <span id="cart-count">0</span></a></li>
-                <li><a href="logout_customer.php" style="color:#ffb3b3;" title="Ganti Meja">🚪 Ganti Meja</a></li>
+                <li><a href="logout_customer.php" style="color:#ffb3b3;">🚪 Ganti Meja</a></li>
             </ul>
+            <div class="customer-info">
+                <span>🪑 <?= $_SESSION['customer']['meja'] ?></span>
+            </div>
             <div class="hamburger" id="hamburger">☰</div>
         </div>
     </nav>
@@ -341,7 +368,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         </div>
     </section>
 
-    <!-- Modal Detail Menu & Add‑ons -->
+    <!-- Modal Add‑ons -->
     <div class="modal-overlay" id="modal-addon">
         <div class="modal-content">
             <span class="modal-close" id="modal-close">&times;</span>
@@ -360,12 +387,10 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         let currentCategory = 'all';
         let currentMenu = null;
 
-        // Fungsi format angka
         function number_format(num) {
             return new Intl.NumberFormat('id-ID').format(num);
         }
 
-        // Update tampilan keranjang (navbar + floating)
         function updateCartCount() {
             fetch('../api/cart.php?action=count')
                 .then(res => res.json())
@@ -375,16 +400,10 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
                     let floatBtn = document.getElementById('floating-cart');
                     let floatBadge = document.getElementById('floating-cart-count');
                     floatBadge.innerText = count;
-                    if (count > 0) {
-                        floatBtn.classList.add('show');
-                    } else {
-                        floatBtn.classList.remove('show');
-                    }
-                })
-                .catch(err => console.error('Gagal update keranjang:', err));
+                    count > 0 ? floatBtn.classList.add('show') : floatBtn.classList.remove('show');
+                });
         }
 
-        // Load kategori
         function loadCategories() {
             fetch(apiMenu + '?action=categories')
                 .then(res => res.json())
@@ -398,7 +417,6 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
                 });
         }
 
-        // Load menu
         function loadMenus(category = 'all', search = '') {
             let url = apiMenu + `?action=list&category=${category}&search=${encodeURIComponent(search)}`;
             fetch(url)
@@ -428,34 +446,18 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
                 });
         }
 
-        // Buka modal
         function bukaModal(menuId) {
-            // Coba ambil dari API get, jika tidak ada fallback ke list
-            fetch(apiMenu + `?action=get&id=${menuId}`)
+            fetch(apiMenu + '?action=get&id=' + menuId)
                 .then(res => res.json())
                 .then(menu => {
                     if (menu.id) {
                         currentMenu = menu;
                         showModalWithData(menu);
                     } else {
-                        // Fallback: ambil dari list (kurang optimal)
-                        fetch(apiMenu + '?action=list')
-                            .then(res => res.json())
-                            .then(allMenus => {
-                                let found = allMenus.find(m => m.id == menuId);
-                                if (found) {
-                                    currentMenu = found;
-                                    showModalWithData(found);
-                                } else {
-                                    Swal.fire('Error', 'Menu tidak ditemukan', 'error');
-                                }
-                            });
+                        Swal.fire('Error', 'Menu tidak ditemukan', 'error');
                     }
                 })
-                .catch(err => {
-                    console.error(err);
-                    Swal.fire('Error', 'Gagal memuat detail menu', 'error');
-                });
+                .catch(() => Swal.fire('Error', 'Gagal memuat detail menu', 'error'));
         }
 
         function showModalWithData(menu) {
@@ -464,7 +466,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
                 <img src="../uploads/${menu.gambar}" alt="${menu.nama}" onerror="this.onerror=null;this.src='../uploads/default.jpg'">
                 <h3>${menu.nama}</h3>
                 <p>${menu.deskripsi ?? ''}</p>
-                <p style="font-size:1.3rem; font-weight:700; color:var(--primary);">Rp ${number_format(menu.harga)}</p>
+                <p style="font-size:1.3rem;font-weight:700;color:var(--gold);">Rp ${number_format(menu.harga)}</p>
                 <div class="qty-selector">
                     <button class="qty-btn" onclick="ubahQty(-1)">−</button>
                     <span id="qty-display">1</span>
@@ -503,9 +505,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         function tambahKeKeranjang() {
             if (!currentMenu) return;
             let qty = parseInt(document.getElementById('qty-display').innerText);
-            // Kumpulkan add‑ons yang dipilih
-            let selectedAddons = Array.from(document.querySelectorAll('.addon-option input:checked'))
-                .map(el => el.value);
+            let selectedAddons = Array.from(document.querySelectorAll('.addon-option input:checked')).map(el => el.value);
             let catatanManual = document.getElementById('modal-catatan').value.trim();
             let finalCatatan = [...selectedAddons, catatanManual].filter(Boolean).join(', ');
 
@@ -530,14 +530,9 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
                     } else {
                         Swal.fire('Gagal', data.message, 'error');
                     }
-                })
-                .catch(err => {
-                    console.error(err);
-                    Swal.fire('Error', 'Gagal menambahkan ke keranjang', 'error');
                 });
         }
 
-        // Filter events
         function attachFilterEvents() {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -549,23 +544,22 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             });
         }
 
-        // Event search
         document.getElementById('search').addEventListener('keyup', function() {
             loadMenus(currentCategory, this.value);
         });
-
-        // Event modal close
         document.getElementById('modal-close').addEventListener('click', tutupModal);
         document.getElementById('modal-addon').addEventListener('click', function(e) {
             if (e.target === this) tutupModal();
         });
-
-        // Hamburger
-        document.getElementById('hamburger').addEventListener('click', function() {
+        document.getElementById('hamburger').addEventListener('click', () => {
             document.getElementById('nav-links').classList.toggle('active');
         });
 
-        // Init
+        // Scroll effect navbar
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
         loadCategories();
         loadMenus();
         updateCartCount();
