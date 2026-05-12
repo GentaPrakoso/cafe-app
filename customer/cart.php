@@ -19,8 +19,52 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             background: linear-gradient(180deg, #fcf9f5 0%, #fff 100%);
         }
 
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--primary);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .hamburger,
+        .customer-info {
+            display: none;
+        }
+
         .cart-page {
-            padding: 6rem 0 4rem;
+            padding: 7rem 0 4rem;
         }
 
         .cart-item {
@@ -148,16 +192,14 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
 </head>
 
 <body>
-    <nav class="navbar" id="navbar">
+    <nav class="navbar">
         <div class="container">
             <a href="index.php" class="logo">☕ Café Modern</a>
-            <ul class="nav-links" id="nav-links">
+            <ul class="nav-links">
                 <li><a href="menu.php">Menu</a></li>
-                <li><a href="cart.php" class="active">🛒 <span id="cart-count">0</span></a></li>
+                <li><a href="cart.php" class="active">🛒 Keranjang</a></li>
                 <li><a href="logout_customer.php" style="color:#ffb3b3;">🚪 Ganti Meja</a></li>
             </ul>
-            <div class="customer-info">🪑 <?= $_SESSION['customer']['meja'] ?></div>
-            <div class="hamburger">☰</div>
         </div>
     </nav>
 
@@ -183,6 +225,10 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
 
     <script>
         let voucherDiskon = 0;
+
+        function number_format(num) {
+            return new Intl.NumberFormat('id-ID').format(num);
+        }
 
         function loadCart() {
             fetch('../api/cart.php?action=list')
@@ -235,20 +281,15 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             document.getElementById('total').innerText = 'Rp ' + number_format(total);
         }
 
-        function number_format(num) {
-            return new Intl.NumberFormat('id-ID').format(num);
-        }
-
         function updateQty(menu_id, qty) {
             if (qty < 1) return;
             fetch('../api/cart.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `action=update&menu_id=${menu_id}&quantity=${qty}`
-                })
-                .then(() => loadCart());
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `action=update&menu_id=${menu_id}&quantity=${qty}`
+            }).then(() => loadCart());
         }
 
         function removeItem(menu_id) {
@@ -259,16 +300,16 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             }).then(res => {
                 if (res.isConfirmed) {
                     fetch('../api/cart.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: `action=remove&menu_id=${menu_id}`
-                        })
-                        .then(() => loadCart());
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `action=remove&menu_id=${menu_id}`
+                    }).then(() => loadCart());
                 }
             });
         }
+
         document.getElementById('apply-voucher').addEventListener('click', function() {
             let code = document.getElementById('voucher-code').value.trim();
             if (!code) return;
@@ -278,14 +319,17 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
                     if (data.success) {
                         voucherDiskon = data.diskon;
                         loadCart();
+                        Swal.fire('Voucher digunakan!', data.message, 'success');
                     } else {
                         Swal.fire('Gagal', data.message, 'error');
                     }
                 });
         });
+
         document.getElementById('btn-checkout').addEventListener('click', () => {
-            window.location.href = 'checkout.php?voucher=' + encodeURIComponent(document.getElementById('voucher-code').value);
+            window.location.href = `checkout.php?voucher=${encodeURIComponent(document.getElementById('voucher-code').value)}`;
         });
+
         loadCart();
     </script>
 </body>

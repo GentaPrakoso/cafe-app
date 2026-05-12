@@ -55,41 +55,58 @@ body {
     padding: 0 20px;
 }
 
-/* Navbar Glass */
+/* ========== Navbar ========== */
 .navbar {
     position: fixed;
+    top: 0;
     width: 100%;
     z-index: 1000;
     padding: 1rem 0;
     transition: var(--transition);
+    /* Default: background solid coklat */
+    background: var(--primary);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* Navbar transparan khusus landing */
+.navbar.transparent {
     background: transparent;
+    box-shadow: none;
 }
-.navbar.scrolled {
-    background: rgba(255, 255, 255, 0.8);
+
+/* Navbar menjadi glass saat scroll (hanya untuk landing) */
+.navbar.transparent.scrolled {
+    background: rgba(255,255,255,0.8);
     backdrop-filter: blur(25px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
+
 .navbar .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 .logo {
     font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: -0.5px;
-    color: white;
+    color: white; /* teks putih karena background coklat */
     text-decoration: none;
 }
-.navbar.scrolled .logo {
+
+/* Navbar transparan saat discroll menjadi gelap */
+.navbar.transparent.scrolled .logo {
     color: var(--primary);
 }
+
 .nav-links {
     display: flex;
     list-style: none;
     gap: 2rem;
     align-items: center;
 }
+
 .nav-links a {
     color: white;
     text-decoration: none;
@@ -97,9 +114,12 @@ body {
     position: relative;
     transition: var(--transition);
 }
-.navbar.scrolled .nav-links a {
+
+/* Navbar transparan discroll: teks berubah jadi coklat */
+.navbar.transparent.scrolled .nav-links a {
     color: var(--primary);
 }
+
 .nav-links a::after {
     content: '';
     position: absolute;
@@ -110,17 +130,21 @@ body {
     background: var(--gold);
     transition: var(--transition);
 }
+
 .nav-links a:hover::after,
 .nav-links a.active::after {
     width: 100%;
 }
+
 .hamburger {
     display: none;
     font-size: 2rem;
     color: white;
     cursor: pointer;
 }
-.navbar.scrolled .hamburger {
+
+/* Navbar transparan discroll: hamburger berubah warna */
+.navbar.transparent.scrolled .hamburger {
     color: var(--primary);
 }
 

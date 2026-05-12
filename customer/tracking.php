@@ -19,22 +19,46 @@ if (!$order_id) {
             background: linear-gradient(180deg, #fcf9f5 0%, #fff 100%);
         }
 
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--primary);
+            padding: 1rem 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
         .tracking-page {
-            padding: 6rem 0 4rem;
+            padding: 7rem 0 4rem;
             min-height: 80vh;
         }
 
         .status-bar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin: 2rem 0;
             flex-wrap: wrap;
         }
 
         .status-step {
             flex: 1;
-            padding: 10px;
             text-align: center;
         }
 
@@ -80,32 +104,30 @@ if (!$order_id) {
 
 <body>
     <nav class="navbar">
-        <div class="container"><a href="index.php" class="logo">☕ Café Modern</a></div>
+        <div class="container">
+            <a href="index.php" class="logo">☕ Café Modern</a>
+        </div>
     </nav>
+
     <section class="tracking-page">
         <div class="container">
             <h2 class="section-title">Lacak Pesanan #<?= $order_id ?></h2>
             <div id="status-progress">
                 <div class="status-bar">
                     <div class="status-step" data-status="menunggu_konfirmasi">
-                        <div class="circle">1</div>
-                        <div class="label">Menunggu Konfirmasi</div>
+                        <div class="circle">1</div><small>Menunggu Konfirmasi</small>
                     </div>
                     <div class="status-step" data-status="diproses">
-                        <div class="circle">2</div>
-                        <div class="label">Diproses</div>
+                        <div class="circle">2</div><small>Diproses</small>
                     </div>
                     <div class="status-step" data-status="sedang_dibuat">
-                        <div class="circle">3</div>
-                        <div class="label">Sedang Dibuat</div>
+                        <div class="circle">3</div><small>Sedang Dibuat</small>
                     </div>
                     <div class="status-step" data-status="siap_diantar">
-                        <div class="circle">4</div>
-                        <div class="label">Siap Diantar</div>
+                        <div class="circle">4</div><small>Siap Diantar</small>
                     </div>
                     <div class="status-step" data-status="selesai">
-                        <div class="circle">5</div>
-                        <div class="label">Selesai</div>
+                        <div class="circle">5</div><small>Selesai</small>
                     </div>
                 </div>
             </div>
@@ -113,6 +135,7 @@ if (!$order_id) {
             <div id="struk-area"></div>
         </div>
     </section>
+
     <script>
         const orderId = <?= $order_id ?>;
 

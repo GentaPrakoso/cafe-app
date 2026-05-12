@@ -19,8 +19,34 @@ $customer = $_SESSION['customer'];
             background: linear-gradient(180deg, #fcf9f5 0%, #fff 100%);
         }
 
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--primary);
+            padding: 1rem 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
         .checkout-page {
-            padding: 6rem 0 4rem;
+            padding: 7rem 0 4rem;
             min-height: 80vh;
         }
 
@@ -74,8 +100,11 @@ $customer = $_SESSION['customer'];
 
 <body>
     <nav class="navbar">
-        <div class="container"><a href="index.php" class="logo">☕ Café Modern</a></div>
+        <div class="container">
+            <a href="index.php" class="logo">☕ Café Modern</a>
+        </div>
     </nav>
+
     <section class="checkout-page">
         <div class="container">
             <h2 class="section-title">Checkout</h2>
@@ -83,20 +112,23 @@ $customer = $_SESSION['customer'];
                 <h3>Detail Pesanan</h3>
                 <p><strong>Nama:</strong> <?= $customer['nama'] ?></p>
                 <p><strong>Meja:</strong> <?= $customer['meja'] ?></p>
-                <div class="form-group"><label>Metode Pembayaran</label>
+                <div class="form-group">
+                    <label>Metode Pembayaran</label>
                     <select id="metode" class="form-input">
                         <option value="cash">Cash (Bayar ke Kasir)</option>
                         <option value="qris">QRIS</option>
                         <option value="transfer">Transfer</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Kode Voucher</label>
+                <div class="form-group">
+                    <label>Kode Voucher</label>
                     <input type="text" id="voucher" class="form-input" value="<?= htmlspecialchars($_GET['voucher'] ?? '') ?>">
                 </div>
                 <button class="btn-order" id="btn-order">Buat Pesanan</button>
             </div>
         </div>
     </section>
+
     <script>
         document.getElementById('btn-order').addEventListener('click', function() {
             const payload = {
@@ -117,14 +149,13 @@ $customer = $_SESSION['customer'];
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                                icon: 'success',
-                                title: 'Pesanan Berhasil',
-                                text: `Invoice: ${data.invoice}`,
-                                confirmButtonText: 'Lacak'
-                            })
-                            .then(() => {
-                                window.location.href = `tracking.php?order_id=${data.order_id}`;
-                            });
+                            icon: 'success',
+                            title: 'Pesanan Berhasil',
+                            text: `Invoice: ${data.invoice}`,
+                            confirmButtonText: 'Lacak'
+                        }).then(() => {
+                            window.location.href = `tracking.php?order_id=${data.order_id}`;
+                        });
                     } else {
                         Swal.fire('Gagal', data.message, 'error');
                     }

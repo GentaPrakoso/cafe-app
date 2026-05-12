@@ -19,8 +19,68 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             background: linear-gradient(180deg, #fcf9f5 0%, #fff 100%);
         }
 
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--primary);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a.active {
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Menu */
         .menu-page {
-            padding: 6rem 0 4rem;
+            padding: 7rem 0 4rem;
         }
 
         .filter-container {
@@ -156,7 +216,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             cursor: not-allowed;
         }
 
-        /* Modal */
+        /* Modal Add‑ons */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -275,10 +335,6 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             margin-top: 15px;
         }
 
-        .btn-tambah-keranjang:hover {
-            background: #5a3e2b;
-        }
-
         /* Floating Cart */
         .floating-cart {
             position: fixed;
@@ -324,24 +380,32 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             font-weight: bold;
         }
 
-        /* Customer info di navbar */
-        .customer-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: white;
-            font-size: 0.9rem;
-        }
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
 
-        .navbar.scrolled .customer-info {
-            color: var(--primary);
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: var(--primary);
+                padding: 1.5rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
         }
     </style>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar">
         <div class="container">
             <a href="index.php" class="logo">☕ Café Modern</a>
             <ul class="nav-links" id="nav-links">
@@ -505,7 +569,8 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
         function tambahKeKeranjang() {
             if (!currentMenu) return;
             let qty = parseInt(document.getElementById('qty-display').innerText);
-            let selectedAddons = Array.from(document.querySelectorAll('.addon-option input:checked')).map(el => el.value);
+            let selectedAddons = Array.from(document.querySelectorAll('.addon-option input:checked'))
+                .map(el => el.value);
             let catatanManual = document.getElementById('modal-catatan').value.trim();
             let finalCatatan = [...selectedAddons, catatanManual].filter(Boolean).join(', ');
 
@@ -555,11 +620,7 @@ if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])
             document.getElementById('nav-links').classList.toggle('active');
         });
 
-        // Scroll effect navbar
-        window.addEventListener('scroll', () => {
-            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-        });
-
+        // Init
         loadCategories();
         loadMenus();
         updateCartCount();
