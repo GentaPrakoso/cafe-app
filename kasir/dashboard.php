@@ -22,6 +22,8 @@ $today_summary = $stmt->fetch();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Kasir — Café Modern</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600;700&family=Barlow+Condensed:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/kasir.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -45,6 +47,9 @@ $today_summary = $stmt->fetch();
             <a href="dashboard.php" class="nav-item active">
                 <span class="nav-icon">📋</span> Pesanan Pending
             </a>
+            <a href="history.php" class="nav-item">
+                <span class="nav-icon">🕓</span> History Pesanan
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -55,9 +60,9 @@ $today_summary = $stmt->fetch();
                     <div class="urole">Kasir</div>
                 </div>
             </div>
-            <a href="../logout.php" class="logout-link">
+            <button class="logout-link" onclick="showLogoutModal()">
                 <span>🚪</span> Logout
-            </a>
+            </button>
         </div>
     </aside>
 
@@ -91,6 +96,11 @@ $today_summary = $stmt->fetch();
                 <div class="stat-value gold">
                     Rp <?= number_format($today_summary['total_pendapatan'] ?? 0, 0, ',', '.') ?>
                 </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-label">Menunggu Bayar</div>
+                <div class="stat-value" style="color: var(--amber)"><?= count($pending_orders) ?></div>
             </div>
         </div>
 
@@ -163,7 +173,33 @@ $today_summary = $stmt->fetch();
 
     </main>
 
+    <!-- ═══ LOGOUT MODAL ═══ -->
+    <div class="modal-overlay" id="logout-modal" onclick="hideLogoutModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-emoji">🚪</div>
+            <div class="modal-title">Yakin mau logout?</div>
+            <div class="modal-desc">Sesi kamu akan diakhiri. Pastikan semua transaksi sudah selesai diproses.</div>
+            <div class="modal-actions">
+                <button class="mbtn mbtn-cancel" onclick="hideLogoutModal()">Batal</button>
+                <a href="../logout.php" class="mbtn mbtn-confirm">Ya, Logout</a>
+            </div>
+        </div>
+    </div>
+
     <script>
+        /* ── Logout Modal ── */
+        function showLogoutModal() {
+            document.getElementById('logout-modal').classList.add('active');
+        }
+
+        function hideLogoutModal() {
+            document.getElementById('logout-modal').classList.remove('active');
+        }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') hideLogoutModal();
+        });
+
+        /* ── Konfirmasi Bayar ── */
         function konfirmasiBayar(order_id) {
             Swal.fire({
                 title: 'Konfirmasi Pembayaran',
@@ -177,7 +213,6 @@ $today_summary = $stmt->fetch();
                 cancelButtonText: 'Batal',
                 confirmButtonColor: '#6ec97a',
                 cancelButtonColor: '#3a3228',
-                borderRadius: '16px',
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch('../api/admin/orders.php', {
@@ -197,11 +232,11 @@ $today_summary = $stmt->fetch();
                                     background: '#1c1812',
                                     color: '#f5ede0',
                                     iconColor: '#6ec97a',
-                                    confirmButtonColor: '#c9a050',
+                                    confirmButtonColor: '#c9a050'
                                 });
                                 const row = document.getElementById('row-' + order_id);
                                 if (row) {
-                                    row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                                    row.style.transition = 'opacity .4s,transform .4s';
                                     row.style.opacity = '0';
                                     row.style.transform = 'translateX(20px)';
                                     setTimeout(() => row.remove(), 400);
@@ -213,7 +248,7 @@ $today_summary = $stmt->fetch();
                                     icon: 'error',
                                     background: '#1c1812',
                                     color: '#f5ede0',
-                                    confirmButtonColor: '#c9a050',
+                                    confirmButtonColor: '#c9a050'
                                 });
                             }
                         });
@@ -221,6 +256,7 @@ $today_summary = $stmt->fetch();
             });
         }
 
+        /* ── Batalkan Pesanan ── */
         function batalkanPesanan(order_id, invoice) {
             Swal.fire({
                 title: 'Batalkan Pesanan?',
@@ -253,11 +289,11 @@ $today_summary = $stmt->fetch();
                                     background: '#1c1812',
                                     color: '#f5ede0',
                                     iconColor: '#6ec97a',
-                                    confirmButtonColor: '#c9a050',
+                                    confirmButtonColor: '#c9a050'
                                 });
                                 const row = document.getElementById('row-' + order_id);
                                 if (row) {
-                                    row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                                    row.style.transition = 'opacity .4s,transform .4s';
                                     row.style.opacity = '0';
                                     row.style.transform = 'translateX(-20px)';
                                     setTimeout(() => row.remove(), 400);
@@ -269,7 +305,7 @@ $today_summary = $stmt->fetch();
                                     icon: 'error',
                                     background: '#1c1812',
                                     color: '#f5ede0',
-                                    confirmButtonColor: '#c9a050',
+                                    confirmButtonColor: '#c9a050'
                                 });
                             }
                         });
@@ -278,9 +314,7 @@ $today_summary = $stmt->fetch();
         }
 
         // Realtime polling setiap 10 detik
-        setInterval(() => {
-            location.reload();
-        }, 10000);
+        setInterval(() => location.reload(), 10000);
     </script>
 </body>
 
