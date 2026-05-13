@@ -18,43 +18,7 @@ requireRole(['admin', 'kasir']);
 
 <body>
 
-    <!-- ═══ SIDEBAR ═══ -->
-    <aside class="sidebar">
-        <div class="sidebar-logo">
-            <div class="brand">Café Modern</div>
-            <span class="tagline">Admin Panel</span>
-        </div>
-
-        <div class="sidebar-section">Navigasi</div>
-
-        <nav>
-            <a href="dashboard.php" class="nav-item">
-                <span class="nav-icon">⬛</span> Dashboard
-            </a>
-            <a href="orders.php" class="nav-item">
-                <span class="nav-icon">📋</span> Pesanan
-            </a>
-            <a href="menus.php" class="nav-item">
-                <span class="nav-icon">☕</span> Kelola Menu
-            </a>
-            <a href="vouchers.php" class="nav-item active">
-                <span class="nav-icon">🏷</span> Voucher
-            </a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <div class="user-chip">
-                <div class="user-avatar"><?= strtoupper(substr($_SESSION['nama'], 0, 1)) ?></div>
-                <div>
-                    <div class="uname"><?= htmlspecialchars($_SESSION['nama']) ?></div>
-                    <div class="urole"><?= ucfirst($_SESSION['role'] ?? 'Staff') ?></div>
-                </div>
-            </div>
-            <a href="../logout.php" class="logout-link">
-                <span>🚪</span> Logout
-            </a>
-        </div>
-    </aside>
+    <?php include 'sidebar.php'; ?>
 
     <!-- ═══ MAIN ═══ -->
     <main class="main">

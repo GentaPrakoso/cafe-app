@@ -2,7 +2,7 @@
    vouchers.css — Café Modern Admin
    Halaman: Manajemen Voucher
    ══════════════════════════════════════════ */
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
 /* ── CSS Variables ── */
 :root {
     --bg:        #0f0c09;
@@ -26,144 +26,11 @@
 }
 
 body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'montserrat', sans-serif;
     background: var(--bg);
     color: var(--cream);
     display: flex;
     min-height: 100vh;
-}
-
-/* ══ SIDEBAR ══ */
-.sidebar {
-    width: 240px;
-    min-height: 100vh;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-}
-
-.sidebar-logo {
-    padding: 2rem 1.5rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--gold);
-    letter-spacing: 0.02em;
-}
-
-.tagline {
-    font-size: 0.72rem;
-    color: var(--cream-dim);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    display: block;
-    margin-top: 2px;
-}
-
-.sidebar-section {
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--cream-dim);
-    padding: 1.4rem 1.5rem 0.5rem;
-}
-
-nav {
-    padding: 0 0.75rem;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    padding: 0.65rem 0.75rem;
-    border-radius: 10px;
-    color: var(--cream-dim);
-    text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 400;
-    transition: all 0.18s;
-    margin-bottom: 2px;
-}
-
-.nav-item:hover {
-    background: var(--surface2);
-    color: var(--cream);
-}
-
-.nav-item.active {
-    background: linear-gradient(135deg, rgba(201, 160, 80, .22), rgba(201, 160, 80, .08));
-    color: var(--gold);
-    font-weight: 500;
-    border: 1px solid rgba(201, 160, 80, .25);
-}
-
-.nav-icon {
-    font-size: 1rem;
-    width: 1.2rem;
-    text-align: center;
-}
-
-.sidebar-footer {
-    margin-top: auto;
-    padding: 1rem 1rem 1.25rem;
-    border-top: 1px solid var(--border);
-}
-
-.user-chip {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.75rem;
-}
-
-.user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.82rem;
-    color: var(--bg);
-}
-
-.uname {
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--cream);
-}
-
-.urole {
-    font-size: 0.7rem;
-    color: var(--cream-dim);
-}
-
-.logout-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--cream-dim);
-    text-decoration: none;
-    font-size: 0.82rem;
-    padding: 0.4rem 0;
-    transition: color 0.18s;
-}
-
-.logout-link:hover {
-    color: var(--red);
 }
 
 /* ══ KEYFRAMES ══ */
@@ -185,7 +52,7 @@ nav {
 }
 
 .page-heading {
-    font-family: 'Playfair Display', serif;
+    font-family: 'montserrat', sans-serif;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.15em;
@@ -196,7 +63,7 @@ nav {
 }
 
 .page-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'montserrat', sans-serif;
     font-size: 2.1rem;
     font-weight: 700;
     color: var(--cream);
@@ -233,7 +100,7 @@ nav {
 }
 
 .form-card-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'montserrat', sans-serif;
     font-size: 1.15rem;
     font-weight: 600;
     color: var(--cream);
