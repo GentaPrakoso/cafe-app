@@ -806,7 +806,7 @@ $uploads = '/cafe-app/uploads/';
                     document.getElementById('menu-grid').innerHTML = data.map(m => `
                     <div class="menu-card" onclick="${m.status !== 'habis' ? `bukaModal(${m.id})` : 'void(0)'}">
                         <div class="card-img-wrap">
-                            <img src="${uploadsPath}${m.gambar}" alt="${m.nama}" onerror="this.src='${uploadsPath}default.jpg'">
+                            <img src="${uploadsPath}${m.gambar}" alt="${m.nama}" onerror="this.onerror=null; this.src='${uploadsPath}default.jpg'">
                             <span class="card-cat-badge">${m.kategori ?? 'Menu'}</span>
                         </div>
                         <div class="card-body">
@@ -835,7 +835,7 @@ $uploads = '/cafe-app/uploads/';
                     currentMenu = m;
                     document.getElementById('modal-body').innerHTML = `
                     <div class="modal-img-wrap">
-                        <img class="modal-img" src="${uploadsPath}${m.gambar}" alt="${m.nama}" onerror="this.src='${uploadsPath}default.jpg'">
+                        <img class="modal-img" src="${uploadsPath}${m.gambar}" alt="${m.nama}" onerror="this.onerror=null; this.src='${uploadsPath}default.jpg'">
                     </div>
                     <div class="modal-body">
                         <h3>${m.nama}</h3>

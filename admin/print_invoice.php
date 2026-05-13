@@ -1,5 +1,6 @@
 <?php
 include '../config/session.php';
+require_once '../config/database.php';
 requireRole(['admin', 'kasir']);
 $db = (new Database())->getConnection();
 $id = $_GET['id'] ?? 0;

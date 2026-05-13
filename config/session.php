@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function isLoggedIn()
 {
@@ -18,8 +20,8 @@ function requireRole($roles)
 {
     requireLogin();
     if (!in_array($_SESSION['role'], $roles)) {
-        header('HTTP/1.0 403 Forbidden');
-        echo "Akses ditolak.";
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Akses ditolak.']);
         exit;
     }
 }
