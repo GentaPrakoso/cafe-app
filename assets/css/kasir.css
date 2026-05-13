@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600;700&family=Barlow+Condensed:wght@300;400;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Bebas+Neue&display=swap');
 /* ═══ VARIABLES ═══ */
 :root {
     --bg-base:      #111009;
@@ -29,9 +28,9 @@
     --text-secondary: #9a8e7a;
     --text-muted:     #5a5040;
 
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-mono:    'JetBrains Mono', monospace;
-    --font-body:    'Barlow Condensed', sans-serif;
+    --font-display: 'Montserrat', sans-serif;
+    --font-mono:    'Montserrat', monospace;
+    --font-body:    'Montserrat', sans-serif;
 
     --sidebar-w:    240px;
     --radius:       8px;
@@ -255,7 +254,7 @@ nav {
 }
 
 .topbar-left h1 {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-size: 2.2rem;
     letter-spacing: 2px;
     color: var(--text-primary);

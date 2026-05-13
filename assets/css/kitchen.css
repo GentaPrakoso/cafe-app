@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600;700&family=Barlow+Condensed:wght@300;400;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
 /* ===== CSS VARIABLES ===== */
 :root {
     --bg-base: #0d0d0d;
@@ -25,9 +24,9 @@
     --text-secondary: #9a9a9a;
     --text-muted: #555;
 
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-body: 'Barlow Condensed', sans-serif;
+--font-display: 'Montserrat', sans-serif;
+--font-mono: 'JetBrains Mono', monospace;
+--font-body: 'Montserrat', sans-serif;
 
     --radius-sm: 4px;
     --radius-md: 8px;
@@ -106,20 +105,21 @@ body::before {
 }
 
 .header-title h1 {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    letter-spacing: 3px;
+    font-family: var(--font-body);
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0;
     color: var(--text-primary);
     line-height: 1;
 }
 
 .header-title span {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 9px;
     color: var(--amber);
-    letter-spacing: 4px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 .header-right {
@@ -188,8 +188,9 @@ body::before {
 .stat-item:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
 
 .stat-num {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
+    font-family: var(--font-body);
+    font-size: 1.9rem;
+    font-weight: 700;
     line-height: 1;
 }
 
@@ -262,9 +263,10 @@ body::before {
 }
 
 .col-name {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    letter-spacing: 3px;
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
     text-transform: uppercase;
 }
 
@@ -376,9 +378,10 @@ body::before {
 }
 
 .order-number {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    letter-spacing: 2px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     color: var(--text-primary);
     line-height: 1;
 }
@@ -566,7 +569,7 @@ body::before {
 .empty-text {
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--text-muted);
     text-align: center;
@@ -694,9 +697,10 @@ body::before {
 }
 
 .modal-title {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    letter-spacing: 2px;
+    font-family: var(--font-body);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0;
     color: var(--text-primary);
 }
 
