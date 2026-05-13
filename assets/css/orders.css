@@ -1,0 +1,277 @@
+/* ═══════════════════════════════════════════════
+   Café Modern — orders.css
+   Scoped styles untuk halaman Kelola Pesanan
+   Depends on: dashboard.css (variables & sidebar)
+   ═══════════════════════════════════════════════ */
+
+/* ── Page heading ── */
+.page-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 6px;
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin-bottom: 28px;
+}
+
+.page-title em {
+    font-style: italic;
+    color: var(--gold);
+}
+
+/* ── Table card wrapper ── */
+.table-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    position: relative;
+    animation: fadeUp 0.5s ease both;
+}
+
+.table-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(201,160,80,0.04) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Table card header ── */
+.table-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--cream);
+}
+
+.table-card-title small {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--cream-dim);
+    margin-top: 3px;
+    letter-spacing: 0.03em;
+}
+
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-dim);
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid rgba(110,201,122,0.2);
+}
+
+.pulse-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* ── Table ── */
+#order-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#order-table th {
+    padding: 13px 20px;
+    text-align: left;
+    background: transparent;
+    color: var(--gold-dim);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+#order-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(201,160,80,0.06);
+    font-size: 13.5px;
+    color: var(--cream-dim);
+    vertical-align: middle;
+    transition: background var(--transition);
+}
+
+#order-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#order-table tbody tr:hover td {
+    background: var(--cream-faint);
+    color: var(--cream);
+}
+
+#order-table .empty-cell {
+    text-align: center;
+    padding: 52px 20px;
+    color: var(--cream-dim);
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+/* ── Select ── */
+#order-table select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--bg-3);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-xs);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 28px 6px 10px;
+    cursor: pointer;
+    transition: border-color var(--transition), box-shadow var(--transition);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a5f2a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    min-width: 158px;
+}
+
+#order-table select:hover,
+#order-table select:focus {
+    border-color: var(--gold);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--gold-glow);
+}
+
+#order-table select option {
+    background: var(--bg-3);
+    color: var(--cream);
+}
+
+/* ── Payment badge ── */
+.pay-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.pay-badge.pending {
+    background: var(--amber-dim);
+    color: var(--amber);
+    border: 1px solid rgba(232,184,75,0.2);
+}
+
+.pay-badge.lunas {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid rgba(110,201,122,0.2);
+}
+
+.pay-badge.gagal {
+    background: rgba(224,112,112,0.12);
+    color: var(--red);
+    border: 1px solid rgba(224,112,112,0.2);
+}
+
+/* ── Action buttons ── */
+.btn-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-xs);
+    color: var(--gold);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.btn-print:hover {
+    background: var(--gold-glow);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(201,160,80,0.18);
+}
+
+.btn-konfirmasi {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: var(--green-dim);
+    border: 1px solid rgba(110,201,122,0.25);
+    border-radius: var(--radius-xs);
+    color: var(--green);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.btn-konfirmasi:hover:not(:disabled) {
+    background: rgba(110,201,122,0.25);
+    border-color: var(--green);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(110,201,122,0.18);
+}
+
+.btn-konfirmasi:disabled {
+    background: transparent;
+    border-color: var(--border);
+    color: rgba(245,237,224,0.2);
+    cursor: not-allowed;
+}
