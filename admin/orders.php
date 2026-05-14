@@ -163,6 +163,53 @@ requireRole(['admin', 'kasir']);
             });
         }
 
+        function batalkanPesanan(order_id) {
+    Swal.fire({
+        title: 'Batalkan Pesanan?',
+        text: 'Pesanan akan dibatalkan dan tidak dapat dikembalikan.',
+        icon: 'warning',
+        background: '#1c1812',
+        color: '#f5ede0',
+        iconColor: '#e07070',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, batalkan',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#e07070',
+        cancelButtonColor: '#3a3228',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('../api/admin/orders.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `action=batalkan_pesanan&order_id=${order_id}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Dibatalkan',
+                        text: 'Pesanan berhasil dibatalkan.',
+                        icon: 'success',
+                        background: '#1c1812',
+                        color: '#f5ede0',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    location.reload();
+                } else {
+                    Swal.fire({
+                        title: 'Gagal',
+                        text: data.message,
+                        icon: 'error',
+                        background: '#1c1812',
+                        color: '#f5ede0'
+                    });
+                }
+            });
+        }
+    });
+}
+
         function printInvoice(order_id) {
             window.open(`print_invoice.php?id=${order_id}`, '_blank');
         }

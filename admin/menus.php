@@ -274,12 +274,12 @@ $kategoris = $kategori_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         /* ── Modal Form ── */
         function showModal(title = 'Tambah Menu') {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-form').classList.add('active');
-            document.getElementById('form-menu').reset();
-            document.getElementById('menu-id').value = '';
-            resetFilePreview();
-        }
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-form').classList.add('active');
+    document.getElementById('form-menu').reset();
+    document.getElementById('menu-id').value = '';
+    resetFilePreview();
+}
 
         function hideModal() {
             document.getElementById('modal-form').classList.remove('active');
@@ -289,22 +289,70 @@ $kategoris = $kategori_stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('btn-batal').addEventListener('click', hideModal);
         document.getElementById('btn-batal-form').addEventListener('click', hideModal);
 
-        /* ── Edit ── */
-        function editMenu(id) {
-            fetch(apiBase + `?action=get&id=${id}`)
-                .then(res => res.json())
-                .then(menu => {
-                    document.getElementById('menu-id').value = menu.id;
-                    document.getElementById('nama').value = menu.nama;
-                    document.getElementById('deskripsi').value = menu.deskripsi ?? '';
-                    document.getElementById('harga').value = menu.harga;
-                    document.getElementById('kategori_id').value = menu.kategori_id;
-                    document.getElementById('status').value = menu.status;
-                    resetFilePreview();
-                    showModal('Edit Menu');
-                })
-                .catch(() => Swal.fire('Error', 'Gagal mengambil data menu', 'error'));
-        }
+/* ── Edit Menu ── */
+/* ── Edit Menu ── */
+function editMenu(id) {
+    console.log('Mengedit menu ID:', id);
+    
+    // Tampilkan loading
+    Swal.fire({
+        title: 'Memuat data...',
+        text: 'Mohon tunggu',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+    
+    fetch(apiBase + `?action=get&id=${id}`)
+        .then(res => {
+            if (!res.ok) throw new Error('Network error');
+            return res.json();
+        })
+        .then(menu => {
+            Swal.close();
+            console.log('Data menu diterima:', menu);
+            
+            if (menu.error) {
+                Swal.fire('Error', menu.error, 'error');
+                return;
+            }
+            
+            if (!menu || !menu.id) {
+                Swal.fire('Error', 'Gagal mengambil data menu', 'error');
+                return;
+            }
+            
+            // Isi form dengan data menu
+            document.getElementById('menu-id').value = menu.id;
+            document.getElementById('nama').value = menu.nama || '';
+            document.getElementById('deskripsi').value = menu.deskripsi || '';
+            document.getElementById('harga').value = menu.harga || 0;
+            document.getElementById('kategori_id').value = menu.kategori_id || '';
+            document.getElementById('status').value = menu.status || 'tersedia';
+            
+            // Reset preview gambar
+            resetFilePreview();
+            
+            // Tampilkan preview gambar yang sudah ada
+            if (menu.gambar && menu.gambar !== '' && menu.gambar !== 'default.jpg') {
+                const previewImg = document.getElementById('preview-img');
+                const previewWrap = document.getElementById('file-preview');
+                const uploadUI = document.getElementById('file-upload-ui');
+                
+                previewImg.src = '../uploads/' + menu.gambar;
+                previewWrap.style.display = 'flex';
+                uploadUI.style.display = 'none';
+            }
+            
+            // Tampilkan modal dengan judul Edit
+            document.getElementById('modal-title').innerText = 'Edit Menu';
+            document.getElementById('modal-form').classList.add('active');
+        })
+        .catch(error => {
+            Swal.close();
+            console.error('Error:', error);
+            Swal.fire('Error', 'Gagal mengambil data menu: ' + error.message, 'error');
+        });
+}
 
         /* ── Submit ── */
         document.getElementById('form-menu').addEventListener('submit', function(e) {
@@ -418,11 +466,15 @@ $kategoris = $kategori_stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('file-remove').addEventListener('click', resetFilePreview);
 
         function resetFilePreview() {
-            fileInput.value = '';
-            previewImg.src = '';
-            previewWrap.style.display = 'none';
-            uploadUI.style.display = 'flex';
-        }
+    const fileInput = document.getElementById('gambar');
+    if (fileInput) fileInput.value = '';
+    const previewImg = document.getElementById('preview-img');
+    if (previewImg) previewImg.src = '';
+    const previewWrap = document.getElementById('file-preview');
+    const uploadUI = document.getElementById('file-upload-ui');
+    if (previewWrap) previewWrap.style.display = 'none';
+    if (uploadUI) uploadUI.style.display = 'flex';
+}
 
         /* ── Logout Modal ── */
         function showLogoutModal() {

@@ -14,12 +14,18 @@ switch ($action) {
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
 
-    case 'get':
-        $id = $_GET['id'] ?? 0;
-        $stmt = $db->prepare("SELECT * FROM menus WHERE id = ?");
-        $stmt->execute([$id]);
-        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
-        break;
+    // Pastikan case 'get' ada di api/admin/menus.php
+case 'get':
+    $id = $_GET['id'] ?? 0;
+    $stmt = $db->prepare("SELECT * FROM menus WHERE id = ?");
+    $stmt->execute([$id]);
+    $menu = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($menu) {
+        echo json_encode($menu);
+    } else {
+        echo json_encode(['error' => 'Menu tidak ditemukan']);
+    }
+    break;
 
     case 'create':
         $nama = $_POST['nama'];
