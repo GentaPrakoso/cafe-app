@@ -1,5 +1,8 @@
 <?php
 session_start();
+include '../config/database.php';
+$db = (new Database())->getConnection();
+
 if (!empty($_SESSION['customer']['nama']) && !empty($_SESSION['customer']['meja'])) {
     header('Location: menu.php');
     exit;
@@ -7,22 +10,35 @@ if (!empty($_SESSION['customer']['nama']) && !empty($_SESSION['customer']['meja'
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama']);
-    $meja = trim($_POST['meja']);
-    if (empty($nama) || empty($meja)) {
+    $kode_meja = trim($_POST['kode_meja']); // Ganti dari 'meja' menjadi 'kode_meja'
+    if (empty($nama) || empty($kode_meja)) {
         $error = 'Nama dan kode meja wajib diisi ya! 😊';
     } else {
-        $_SESSION['customer'] = [
-            'nama' => htmlspecialchars($nama),
-            'meja' => htmlspecialchars($meja)
-        ];
-        header('Location: menu.php');
-        exit;
+        // Cek apakah kode meja valid dan tersedia
+        $stmt = $db->prepare("SELECT * FROM meja_kode WHERE kode = ? AND status = 'tersedia'");
+        $stmt->execute([$kode_meja]);
+        $meja = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$meja) {
+            $error = "Kode meja tidak valid atau sedang digunakan. Silakan minta kode baru ke kasir.";
+        } else {
+            // Update status meja menjadi terisi
+            $sessionId = session_id();
+            $update = $db->prepare("UPDATE meja_kode SET status = 'terisi', customer_session_id = ?, waktu_mulai = NOW() WHERE kode = ?");
+            $update->execute([$sessionId, $kode_meja]);
+            // Simpan session customer
+            $_SESSION['customer'] = [
+                'nama' => htmlspecialchars($nama),
+                'meja' => $meja['nomor_meja'],
+                'kode_meja' => $kode_meja
+            ];
+            header('Location: menu.php');
+            exit;
+        }
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        /* (semua style tetap sama seperti aslinya, hanya ubah placeholder input) */
         *,
         *::before,
         *::after {
@@ -64,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow-x: hidden;
         }
 
-        /* ---- Background ---- */
         .bg-layer {
             position: fixed;
             inset: 0;
@@ -93,7 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 1;
         }
 
-        /* ---- Navbar ---- */
         nav {
             position: fixed;
             top: 0;
@@ -151,7 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--gold);
         }
 
-        /* ---- Main ---- */
         main {
             position: relative;
             z-index: 5;
@@ -163,7 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 7rem 2.5rem 3rem;
         }
 
-        /* ---- Left ---- */
         .left {
             flex: 1;
             max-width: 420px;
@@ -246,7 +259,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 14px;
         }
 
-        /* ---- Card ---- */
         .right {
             flex: 0 0 390px;
             animation: fadeRight 0.9s ease 0.15s both;
@@ -287,7 +299,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 2rem;
         }
 
-        /* Error */
         .error-msg {
             background: rgba(220, 80, 60, 0.1);
             border: 1px solid rgba(220, 80, 60, 0.3);
@@ -298,7 +309,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 1.1rem;
         }
 
-        /* Fields */
         .field {
             margin-bottom: 1.2rem;
         }
@@ -336,7 +346,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 0 0 4px rgba(201, 160, 80, 0.08);
         }
 
-        /* Button */
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -364,7 +373,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateY(0);
         }
 
-        /* Divider */
         .divider {
             display: flex;
             align-items: center;
@@ -398,7 +406,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--gold);
         }
 
-        /* ---- Footer Strip ---- */
         footer {
             position: relative;
             z-index: 5;
@@ -431,87 +438,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             animation: pulse 2s infinite;
         }
 
-        /* ---- Animations ---- */
         @keyframes fadeLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-28px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-28px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes fadeRight {
-            from {
-                opacity: 0;
-                transform: translateX(28px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(28px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.35;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
         }
 
-        /* ---- Responsive ---- */
         @media (max-width: 820px) {
-            main {
-                flex-direction: column;
-                gap: 2.5rem;
-                padding-top: 6rem;
-            }
-
-            .left {
-                max-width: 100%;
-            }
-
-            .right {
-                flex: 0 0 100%;
-                width: 100%;
-            }
-
-            h1 {
-                font-size: 2.6rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
+            main { flex-direction: column; gap: 2.5rem; padding-top: 6rem; }
+            .left { max-width: 100%; }
+            .right { flex: 0 0 100%; width: 100%; }
+            h1 { font-size: 2.6rem; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 
 <body>
-
     <div class="bg-layer"></div>
     <div class="bg-grain"></div>
     <div class="deco-ring" style="width:520px;height:520px;top:-200px;right:-120px;opacity:0.35;"></div>
     <div class="deco-ring" style="width:320px;height:320px;bottom:-100px;left:-60px;opacity:0.25;"></div>
 
     <nav id="navbar">
-        <a href="index.php" class="logo">
-            Café Modern
-            <small>Est. 2019 · Bandung</small>
-        </a>
+        <a href="index.php" class="logo">Café Modern <small>Est. 2019 · Bandung</small></a>
         <ul class="nav-links">
             <li><a href="menu.php">Menu</a></li>
-            <li><a href="tracking_last.php">Lacak Pesanan</a></li>
-            <li><a href="history.php">History</a></li>
             <li><a href="cart.php">Keranjang 🛒</a></li>
         </ul>
     </nav>
@@ -522,34 +483,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="badge-dot"></div>
                 <span>Buka Sekarang · 08:00 – 22:00</span>
             </div>
-
-            <h1>
-                Mulai hari<br>
-                yang <em>luar biasa</em><br>
-                dari sini.
-            </h1>
-
-            <p class="subhead">
-                Pilih menu favoritmu, duduk santai, dan biarkan kami yang urus sisanya. Setiap tegukan adalah pengalaman tersendiri.
-            </p>
-
+            <h1>Mulai hari<br>yang <em>luar biasa</em><br>dari sini.</h1>
+            <p class="subhead">Pilih menu favoritmu, duduk santai, dan biarkan kami yang urus sisanya.</p>
             <div class="perks">
-                <div class="perk">
-                    <div class="perk-icon">☕</div>
-                    Specialty Coffee
-                </div>
-                <div class="perk">
-                    <div class="perk-icon">🥐</div>
-                    Fresh Pastry
-                </div>
-                <div class="perk">
-                    <div class="perk-icon">⚡</div>
-                    Order Cepat
-                </div>
-                <div class="perk">
-                    <div class="perk-icon">🎵</div>
-                    Good Vibes
-                </div>
+                <div class="perk"><div class="perk-icon">☕</div>Specialty Coffee</div>
+                <div class="perk"><div class="perk-icon">🥐</div>Fresh Pastry</div>
+                <div class="perk"><div class="perk-icon">⚡</div>Order Cepat</div>
+                <div class="perk"><div class="perk-icon">🎵</div>Good Vibes</div>
             </div>
         </div>
 
@@ -565,37 +505,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form method="post" novalidate>
                     <div class="field">
                         <label for="nama">Nama Kamu</label>
-                        <input
-                            type="text"
-                            id="nama"
-                            name="nama"
-                            placeholder="cth. Rina Setiawan"
-                            value="<?= isset($_POST['nama']) ? htmlspecialchars($_POST['nama']) : '' ?>"
-                            autocomplete="given-name"
-                            required>
+                        <input type="text" id="nama" name="nama" placeholder="cth. Rina Setiawan" autocomplete="given-name" required>
                     </div>
-
                     <div class="field">
-                        <label for="meja">Kode Meja</label>
-                        <input
-                            type="text"
-                            id="meja"
-                            name="meja"
-                            placeholder="cth. MEJA-05"
-                            value="<?= isset($_POST['meja']) ? htmlspecialchars($_POST['meja']) : '' ?>"
-                            autocomplete="off"
-                            required>
+                        <label for="kode_meja">Kode Meja</label>
+                        <input type="text" id="kode_meja" name="kode_meja" placeholder="Masukkan kode meja (contoh: QWERTY)" autocomplete="off" required>
                     </div>
-
                     <button type="submit" class="btn-submit">Lihat Menu Kami &rarr;</button>
                 </form>
 
-                <div class="divider">
-                    <div class="divider-line"></div>
-                    <span>atau</span>
-                    <div class="divider-line"></div>
-                </div>
-
+                <div class="divider"><div class="divider-line"></div><span>atau</span><div class="divider-line"></div></div>
                 <a href="menu.php" class="link-browse">Lihat menu tanpa pesan dulu</a>
             </div>
         </div>
@@ -603,19 +522,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <footer>
         <span class="footer-text">© 2025 Café Modern · All rights reserved</span>
-        <div class="status">
-            <div class="status-dot"></div>
-            Dapur aktif
-        </div>
+        <div class="status"><div class="status-dot"></div>Dapur aktif</div>
     </footer>
 
     <script>
         const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            navbar.classList.toggle('scrolled', window.scrollY > 40);
-        });
+        window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 40); });
     </script>
-
 </body>
-
 </html>

@@ -104,6 +104,13 @@ try {
     unset($_SESSION['active_voucher']);
     $_SESSION['cart'] = [];
 
+// Setelah $db->commit(); dan sebelum echo json_encode
+// Update status meja menjadi terisi dengan order_id
+if (isset($_SESSION['customer']['kode_meja'])) {
+    $update_meja = $db->prepare("UPDATE meja_kode SET order_id = ? WHERE kode = ?");
+    $update_meja->execute([$order_id, $_SESSION['customer']['kode_meja']]);
+}
+
     echo json_encode([
         'success' => true,
         'order_id' => $order_id,

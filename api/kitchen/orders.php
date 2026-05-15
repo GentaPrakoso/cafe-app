@@ -65,6 +65,15 @@ switch ($action) {
         } else {
             echo json_encode(['success' => false]);
         }
+
+        // Di dalam case 'update_status', setelah update status menjadi selesai
+if ($finalStatus === 'selesai') {
+    
+    // Lepaskan meja
+    $stmt_meja = $db->prepare("UPDATE meja_kode SET status = 'tersedia', customer_session_id = NULL, waktu_mulai = NULL, order_id = NULL WHERE order_id = ?");
+    $stmt_meja->execute([$order_id]);
+}
+
         break;
         
     case 'done_today':

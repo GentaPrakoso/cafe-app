@@ -238,6 +238,14 @@
             <?php endif; ?>
         </a>
 
+        
+        <!-- TAMBAHAN: Menu Status Meja -->
+        <a href="meja_status.php"
+            class="nav-item <?= basename($_SERVER['PHP_SELF']) == 'meja_status.php' ? 'active' : '' ?>">
+            <span class="nav-icon">🪑</span>
+            Status Meja
+        </a>
+
         <a href="menus.php"
             class="nav-item <?= basename($_SERVER['PHP_SELF']) == 'menus.php' ? 'active' : '' ?>">
             <span class="nav-icon">☕</span>
@@ -249,6 +257,7 @@
             <span class="nav-icon">🏷</span>
             Voucher
         </a>
+
 
     </nav>
 
