@@ -284,11 +284,6 @@ $customer = $_SESSION['customer'];
             background: rgba(201, 160, 80, 0.05);
         }
 
-        .field input::placeholder {
-            color: rgba(245, 237, 224, 0.22);
-        }
-
-        /* Payment options */
         .pay-options {
             display: flex;
             flex-direction: column;
@@ -458,11 +453,7 @@ $customer = $_SESSION['customer'];
                 </div>
             </div>
 
-            <!-- Voucher -->
-            <div class="field">
-                <label>Kode Voucher</label>
-                <input type="text" id="voucher" placeholder="Masukkan kode voucher (opsional)" value="<?= htmlspecialchars($_GET['voucher'] ?? '') ?>">
-            </div>
+            <!-- Voucher sudah dihapus -->
 
             <button class="btn-order" id="btn-order">Buat Pesanan Sekarang →</button>
             <a href="cart.php" class="back-link">← Kembali ke Keranjang</a>
@@ -484,15 +475,25 @@ $customer = $_SESSION['customer'];
                     nama: '<?= addslashes($customer['nama']) ?>',
                     meja: '<?= addslashes($customer['meja']) ?>',
                     tipe: 'dine-in',
-                    metode,
-                    voucher: document.getElementById('voucher').value.trim()
+                    metode: metode,
+                    voucher: '' // voucher dikosongkan
                 })
             }).then(r => r.json()).then(d => {
                 if (d.success) {
+                    let judul, icon, pesanTambahan;
+                    if (metode === 'cash') {
+                        judul = 'Pesanan Dibuat! 💰';
+                        icon = 'info';
+                        pesanTambahan = 'Silakan datang ke kasir untuk melakukan pembayaran dan konfirmasi.';
+                    } else {
+                        judul = 'Pesanan Berhasil! 🎉';
+                        icon = 'success';
+                        pesanTambahan = 'Pembayaran Anda akan dikonfirmasi oleh kasir. Struk akan muncul setelah konfirmasi.';
+                    }
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Pesanan Berhasil! 🎉',
-                        text: `Invoice: ${d.invoice}`,
+                        icon: icon,
+                        title: judul,
+                        html: `Invoice: <strong>${d.invoice}</strong><br><br>${pesanTambahan}`,
                         confirmButtonText: 'Lacak Pesanan →',
                         background: '#1c1008',
                         color: '#f5ede0',

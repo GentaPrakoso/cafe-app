@@ -74,9 +74,6 @@ switch ($action) {
         echo json_encode(['success' => true]);
         break;
 
-    default:
-        echo json_encode(['error' => 'Invalid action']);
-
     case 'update_notes':
         $menu_id = $_POST['menu_id'] ?? 0;
         $catatan = $_POST['catatan'] ?? '';
@@ -106,6 +103,14 @@ switch ($action) {
             }
             if ($subtotal >= $voucher['minimal_pembelian']) {
                 $diskon = ($voucher['tipe_diskon'] == 'persen') ? $subtotal * ($voucher['nilai'] / 100) : $voucher['nilai'];
+                // Simpan voucher ke session
+                $_SESSION['active_voucher'] = [
+                    'kode' => $kode,
+                    'diskon' => $diskon,
+                    'voucher_id' => $voucher['id'],
+                    'nilai' => $voucher['nilai'],
+                    'tipe' => $voucher['tipe_diskon']
+                ];
                 echo json_encode([
                     'success' => true,
                     'diskon' => $diskon,
@@ -113,10 +118,31 @@ switch ($action) {
                     'message' => "Voucher berlaku, diskon Rp " . number_format($diskon)
                 ]);
             } else {
+                // Hapus voucher session jika gagal
+                unset($_SESSION['active_voucher']);
                 echo json_encode(['success' => false, 'message' => 'Minimal pembelian Rp ' . number_format($voucher['minimal_pembelian'])]);
             }
         } else {
+            unset($_SESSION['active_voucher']);
             echo json_encode(['success' => false, 'message' => 'Kode voucher tidak valid']);
         }
+        break;
+
+    case 'get_active_voucher':
+        // Untuk mengambil voucher yang sedang aktif di session
+        if (isset($_SESSION['active_voucher'])) {
+            echo json_encode($_SESSION['active_voucher']);
+        } else {
+            echo json_encode(null);
+        }
+        break;
+
+    case 'remove_voucher':
+        unset($_SESSION['active_voucher']);
+        echo json_encode(['success' => true]);
+        break;
+
+    default:
+        echo json_encode(['error' => 'Invalid action']);
         break;
 }

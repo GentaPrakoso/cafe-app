@@ -105,6 +105,25 @@ case 'history_stats':
             echo json_encode(['success' => false, 'message' => 'Status tidak valid']);
         }
         break;
+
+    case 'get_detail':
+        $id = $_GET['id'] ?? 0;
+        if (!$id) {
+            echo json_encode(['success' => false, 'message' => 'ID tidak valid']);
+            break;
+        }
+        $stmt = $db->prepare("SELECT * FROM orders WHERE id = ?");
+        $stmt->execute([$id]);
+        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($order) {
+            $stmt_items = $db->prepare("SELECT oi.*, m.nama as nama_menu FROM order_items oi JOIN menus m ON oi.menu_id = m.id WHERE oi.order_id = ?");
+            $stmt_items->execute([$id]);
+            $items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'order' => $order, 'items' => $items]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Pesanan tidak ditemukan']);
+        }
+        break;
         
 case 'konfirmasi_pembayaran':
     $order_id = $_POST['order_id'];

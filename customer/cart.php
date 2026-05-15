@@ -17,6 +17,7 @@ $uploads = '/cafe-app/uploads/';
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        /* (semua style tetap sama seperti aslinya) */
         *,
         *::before,
         *::after {
@@ -428,6 +429,8 @@ $uploads = '/cafe-app/uploads/';
         <ul class="nav-links">
             <li><a href="menu.php">Menu</a></li>
             <li><a href="cart.php" class="active">Keranjang</a></li>
+            <li><a href="tracking_last.php">Lacak Pesanan</a></li>
+            <li><a href="history.php">History</a></li>
             <li><a href="logout_customer.php" style="color:#f08070;">Ganti Meja</a></li>
         </ul>
     </nav>
@@ -446,9 +449,13 @@ $uploads = '/cafe-app/uploads/';
             <div class="sum-row"><span>Service (5%)</span><span class="val" id="service">Rp 0</span></div>
             <div class="sum-row discount"><span>Diskon Voucher</span><span class="val" id="diskon">− Rp 0</span></div>
             <div class="sum-row total"><span>Total</span><span class="val" id="total">Rp 0</span></div>
-            <div class="voucher-row">
+            <div class="voucher-row" id="voucher-row">
                 <input type="text" class="voucher-input" id="voucher-code" placeholder="Punya kode voucher?">
                 <button class="btn-voucher" id="apply-voucher">Gunakan</button>
+            </div>
+            <div id="active-voucher-info" style="display:none; margin-bottom: 1rem; background: rgba(110,201,122,0.1); padding: 8px 12px; border-radius: 12px;">
+                <span id="voucher-code-display"></span>
+                <button id="remove-voucher-btn" style="background: none; border: none; color: #e07070; cursor: pointer; float: right;">✕ Batalkan</button>
             </div>
             <button class="btn-checkout" id="btn-checkout">Lanjutkan Pembayaran →</button>
         </div>
@@ -463,6 +470,7 @@ $uploads = '/cafe-app/uploads/';
     <script>
         const uploadsPath = '<?= $uploads ?>';
         let voucherDiskon = 0;
+        let activeVoucher = null;
 
         function fmt(n) {
             return new Intl.NumberFormat('id-ID').format(n);
@@ -527,7 +535,7 @@ $uploads = '/cafe-app/uploads/';
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: `action=update&menu_id=${id}&quantity=${qty}`
-            }).then(() => loadCart());
+            }).then(() => loadCart().then(() => fetchActiveVoucher())); // Reload voucher juga
         }
 
         function removeItem(id) {
@@ -549,9 +557,30 @@ $uploads = '/cafe-app/uploads/';
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
                         body: `action=remove&menu_id=${id}`
-                    }).then(() => loadCart());
+                    }).then(() => loadCart().then(() => fetchActiveVoucher()));
                 }
             });
+        }
+
+        function fetchActiveVoucher() {
+            fetch('/cafe-app/api/cart.php?action=get_active_voucher')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.kode) {
+                        activeVoucher = data;
+                        voucherDiskon = data.diskon;
+                        document.getElementById('active-voucher-info').style.display = 'block';
+                        document.getElementById('voucher-code-display').innerHTML = `🎫 Voucher aktif: <strong>${data.kode}</strong> (diskon Rp ${fmt(data.diskon)})`;
+                        document.getElementById('voucher-row').style.display = 'none';
+                        loadCart(); // reload cart agar diskon terupdate
+                    } else {
+                        activeVoucher = null;
+                        voucherDiskon = 0;
+                        document.getElementById('active-voucher-info').style.display = 'none';
+                        document.getElementById('voucher-row').style.display = 'flex';
+                        loadCart();
+                    }
+                });
         }
 
         document.getElementById('apply-voucher').addEventListener('click', () => {
@@ -561,15 +590,8 @@ $uploads = '/cafe-app/uploads/';
                 .then(r => r.json())
                 .then(d => {
                     if (d.success) {
-                        voucherDiskon = d.diskon;
-                        loadCart();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Voucher aktif! 🎉',
-                            text: d.message,
-                            background: '#1c1008',
-                            color: '#f5ede0'
-                        });
+                        // Reload halaman agar session voucher tersimpan dan tampilan terbaru
+                        window.location.reload();
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -582,10 +604,20 @@ $uploads = '/cafe-app/uploads/';
                 });
         });
 
-        document.getElementById('btn-checkout').addEventListener('click', () => {
-            window.location.href = `checkout.php?voucher=${encodeURIComponent(document.getElementById('voucher-code').value)}`;
+        document.getElementById('remove-voucher-btn')?.addEventListener('click', () => {
+            fetch('/cafe-app/api/cart.php?action=remove_voucher', {
+                    method: 'POST'
+                })
+                .then(() => window.location.reload());
         });
 
+        document.getElementById('btn-checkout').addEventListener('click', () => {
+            // Tidak perlu mengirim voucher via URL karena sudah di session
+            window.location.href = 'checkout.php';
+        });
+
+        // Load awal
+        fetchActiveVoucher();
         loadCart();
     </script>
 </body>

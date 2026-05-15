@@ -1,5 +1,21 @@
 <?php
 session_start();
+// customer/menu.php - tambahkan setelah session_start dan cek session customer
+if (isset($_GET['info']) && $_GET['info'] == 'belum_pesan') {
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                icon: "info",
+                title: "Belum ada pesanan",
+                text: "Anda belum pernah membuat pesanan. Silakan pilih menu terlebih dahulu.",
+                background: "#1c1008",
+                color: "#f5ede0",
+                confirmButtonColor: "#c9a050"
+            });
+        });
+    </script>';
+}
+
 if (empty($_SESSION['customer']['nama']) || empty($_SESSION['customer']['meja'])) {
     header('Location: index.php');
     exit;
@@ -722,6 +738,8 @@ $uploads = '/cafe-app/uploads/';
             <ul class="nav-links" id="nav-links">
                 <li><a href="menu.php" class="active">Menu</a></li>
                 <li><a href="cart.php">Keranjang <span id="cart-count">0</span></a></li>
+                <li><a href="tracking_last.php">Lacak Pesanan</a></li>
+                <li><a href="history.php">History</a></li>
                 <li><a href="logout_customer.php" style="color:#f08070;">Ganti Meja</a></li>
             </ul>
             <span class="meja-badge">🪑 <?= htmlspecialchars($_SESSION['customer']['meja']) ?></span>

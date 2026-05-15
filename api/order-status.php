@@ -9,7 +9,7 @@ if (!$order_id) {
     exit;
 }
 
-$stmt = $db->prepare("SELECT id, invoice, status_pesanan, status_pembayaran, nama_pelanggan, nomor_meja, tipe_pesanan, total 
+$stmt = $db->prepare("SELECT id, invoice, status_pesanan, status_pembayaran, metode_pembayaran, nama_pelanggan, nomor_meja, tipe_pesanan, total  
                       FROM orders WHERE id = ?");
 $stmt->execute([$order_id]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);

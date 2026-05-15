@@ -25,7 +25,38 @@ $nama = htmlspecialchars($data['nama']);
 $meja = htmlspecialchars($data['meja'] ?? '');
 $tipe = 'dine-in';
 $metode = in_array($data['metode'], ['cash', 'qris', 'transfer']) ? $data['metode'] : 'cash';
-$voucher_kode = trim($data['voucher'] ?? '');
+// Voucher diambil dari session (bukan dari input)
+$voucher_kode = '';
+$diskon = 0;
+$voucher_id = null;
+
+// Cek session voucher
+if (isset($_SESSION['active_voucher']) && !empty($_SESSION['active_voucher'])) {
+    $voucher_session = $_SESSION['active_voucher'];
+    $voucher_kode = $voucher_session['kode'];
+    // Kita validasi ulang ke database untuk memastikan masih berlaku
+    $stmt = $db->prepare("SELECT * FROM vouchers WHERE kode = ? AND (tanggal_mulai IS NULL OR tanggal_mulai <= CURDATE()) AND (tanggal_berakhir IS NULL OR tanggal_berakhir >= CURDATE())");
+    $stmt->execute([$voucher_kode]);
+    $voucher = $stmt->fetch();
+    if ($voucher) {
+        $subtotal_temp = 0;
+        foreach ($_SESSION['cart'] as $menu_id => $item) {
+            $stmt2 = $db->prepare("SELECT harga FROM menus WHERE id = ?");
+            $stmt2->execute([$menu_id]);
+            $menu = $stmt2->fetch();
+            $subtotal_temp += $menu['harga'] * $item['quantity'];
+        }
+        if ($subtotal_temp >= $voucher['minimal_pembelian']) {
+            $diskon = ($voucher['tipe_diskon'] == 'persen') ? $subtotal_temp * ($voucher['nilai'] / 100) : $voucher['nilai'];
+            $voucher_id = $voucher['id'];
+        } else {
+            // Jika minimal pembelian tidak terpenuhi, hapus session voucher
+            unset($_SESSION['active_voucher']);
+        }
+    } else {
+        unset($_SESSION['active_voucher']);
+    }
+}
 
 // Hitung subtotal dari cart
 $subtotal = 0;
@@ -49,19 +80,6 @@ foreach ($_SESSION['cart'] as $menu_id => $item) {
 // Pajak & service
 $pajak = round($subtotal * 0.1);
 $service = round($subtotal * 0.05);
-$diskon = 0;
-$voucher_id = null;
-
-// Cek voucher jika ada
-if (!empty($voucher_kode)) {
-    $stmt = $db->prepare("SELECT * FROM vouchers WHERE kode = ? AND (tanggal_mulai IS NULL OR tanggal_mulai <= CURDATE()) AND (tanggal_berakhir IS NULL OR tanggal_berakhir >= CURDATE())");
-    $stmt->execute([$voucher_kode]);
-    $voucher = $stmt->fetch();
-    if ($voucher && $subtotal >= $voucher['minimal_pembelian']) {
-        $diskon = ($voucher['tipe_diskon'] == 'persen') ? $subtotal * ($voucher['nilai'] / 100) : $voucher['nilai'];
-        $voucher_id = $voucher['id'];
-    }
-}
 
 $total = $subtotal + $pajak + $service - $diskon;
 $invoice = 'INV-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
@@ -74,15 +92,16 @@ try {
     $stmt->execute([$invoice, $nama, $meja, $tipe, $metode, $subtotal, $pajak, $service, $diskon, $total, $voucher_id]);
     $order_id = $db->lastInsertId();
 
-    // Insert order items (ini yang penting!)
+    // Insert order items
     $stmt_item = $db->prepare("INSERT INTO order_items (order_id, menu_id, quantity, harga_satuan, catatan) VALUES (?, ?, ?, ?, ?)");
     foreach ($cart_items as $item) {
         $stmt_item->execute([$order_id, $item['menu_id'], $item['quantity'], $item['harga'], $item['catatan']]);
     }
 
     $db->commit();
-
-    // Kosongkan cart
+    $_SESSION['last_order_id'] = $order_id;
+    // Hapus session voucher dan kosongkan cart
+    unset($_SESSION['active_voucher']);
     $_SESSION['cart'] = [];
 
     echo json_encode([

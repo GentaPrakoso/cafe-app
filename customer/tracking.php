@@ -532,7 +532,199 @@ if (!$order_id) {
         </div>
     </div>
 
+    <!-- Modal Peringatan Cash -->
+    <div id="cashModal" class="cash-modal-overlay" style="display: none;">
+        <div class="cash-modal-container">
+            <div class="cash-modal-icon">💵</div>
+            <h3 class="cash-modal-title">Pembayaran Cash</h3>
+            <p class="cash-modal-message">Silakan datang ke <strong>kasir</strong> untuk melakukan pembayaran dan konfirmasi pesanan.</p>
+            <button id="cashModalCloseBtn" class="cash-modal-btn" disabled>Mengaktifkan dalam 3 detik...</button>
+        </div>
+    </div>
+
+    <!-- Modal Wajib Download Struk (baru) -->
+    <div id="strukModal" class="cash-modal-overlay" style="display: none;">
+        <div class="cash-modal-container">
+            <div class="cash-modal-icon">🧾</div>
+            <h3 class="cash-modal-title">WAJIB DOWNLOAD STRUK</h3>
+            <p class="cash-modal-message">Pesanan Anda telah dikonfirmasi. Silakan download struk sebagai bukti pembayaran.</p>
+            <a id="strukModalBtn" href="#" class="cash-modal-btn" style="display: inline-block; text-decoration: none; text-align: center;" disabled>Mengaktifkan dalam 3 detik...</a>
+        </div>
+    </div>
+
+    <style>
+        .cash-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .cash-modal-container {
+            background: #1c1812;
+            border: 2px solid #c9a050;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .cash-modal-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .cash-modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #f5ede0;
+            margin-bottom: 0.5rem;
+        }
+
+        .cash-modal-message {
+            color: rgba(245, 237, 224, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cash-modal-btn {
+            background: #c9a050;
+            color: #1a1008;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .cash-modal-btn:disabled {
+            background: #5a4a2a;
+            color: #b8a898;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .cash-modal-btn:enabled {
+            background: #c9a050;
+            color: #1a1008;
+            pointer-events: auto;
+        }
+
+        .cash-modal-btn:enabled:hover {
+            background: #e4b85a;
+            transform: translateY(-2px);
+        }
+    </style>
+
     <script>
+        // ========== MODAL CASH PERIODIK ==========
+        let cashModalLastShown = 0;
+
+        function showCashModal() {
+            const modal = document.getElementById('cashModal');
+            const btn = document.getElementById('cashModalCloseBtn');
+            if (!modal) return;
+            if (modal.style.display === 'flex') return;
+            btn.disabled = true;
+            btn.innerText = 'Mengaktifkan dalam 3 detik...';
+            modal.style.display = 'flex';
+            let countdown = 3;
+            const timerInterval = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    clearInterval(timerInterval);
+                    btn.disabled = false;
+                    btn.innerText = 'OK, Saya mengerti';
+                } else {
+                    btn.innerText = `Mengaktifkan dalam ${countdown} detik...`;
+                }
+            }, 1000);
+            btn.onclick = () => {
+                if (!btn.disabled) {
+                    modal.style.display = 'none';
+                    cashModalLastShown = Date.now();
+                }
+            };
+        }
+
+        function checkAndShowCashModal(order) {
+            // Hanya untuk cash & pending
+            if (order.metode_pembayaran === 'cash' && order.status_pembayaran !== 'paid') {
+                const now = Date.now();
+                if (cashModalLastShown === 0 || (now - cashModalLastShown) >= 300000) { // 5 menit
+                    showCashModal();
+                }
+            } else {
+                // Jika sudah lunas, tutup modal jika terbuka
+                const modal = document.getElementById('cashModal');
+                if (modal) modal.style.display = 'none';
+            }
+        }
+
+        // ========== MODAL WAJIB DOWNLOAD STRUK ==========
+        let previousPaymentStatus = 'pending'; // untuk tracking perubahan status
+
+        function showStrukModal(orderId) {
+            const modal = document.getElementById('strukModal');
+            const btn = document.getElementById('strukModalBtn');
+            if (!modal) return;
+            const key = 'struk_shown_' + orderId;
+            if (localStorage.getItem(key) === 'true') return;
+
+            btn.disabled = true;
+            btn.innerText = 'Mengaktifkan dalam 3 detik...';
+            modal.style.display = 'flex';
+
+            let countdown = 3;
+            const timerInterval = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    clearInterval(timerInterval);
+                    btn.disabled = false;
+                    btn.innerText = '📄 Download Struk Sekarang';
+                    btn.href = `struk.php?order_id=${orderId}`;
+                    btn.target = '_blank';
+                } else {
+                    btn.innerText = `Mengaktifkan dalam ${countdown} detik...`;
+                }
+            }, 1000);
+
+            // Tandai sudah ditampilkan
+            localStorage.setItem(key, 'true');
+
+            // Saat tombol diklik, tutup modal (link sudah akan membuka tab baru)
+            btn.onclick = function() {
+                if (!btn.disabled) {
+                    modal.style.display = 'none';
+                }
+                return true;
+            };
+        }
+
         const orderId = <?= $order_id ?>;
         const statusOrder = ['menunggu_konfirmasi', 'diproses', 'sedang_dibuat', 'siap_diantar', 'selesai'];
 
@@ -545,6 +737,28 @@ if (!$order_id) {
                 .then(r => r.json())
                 .then(order => {
                     if (order.error) return;
+                    // Jika pesanan dibatalkan
+                    if (order.status_pembayaran === 'failed' || order.status_pesanan === 'batal') {
+                        document.getElementById('invoice-tag').innerText = order.invoice;
+                        document.getElementById('track-steps').innerHTML = `
+                            <div style="text-align: center; padding: 30px 20px;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+                                <h3 style="color: var(--red); margin-bottom: 10px;">Pesanan Dibatalkan</h3>
+                                <p>Pesanan dengan invoice ${order.invoice} telah dibatalkan oleh kasir.</p>
+                                <a href="menu.php" class="btn-struk" style="display: inline-block; margin-top: 20px;">☕ Pesan Lagi</a>
+                            </div>
+                        `;
+                        document.getElementById('order-detail').style.display = 'none';
+                        document.getElementById('actions-area').innerHTML = '';
+                        return;
+                    }
+                    checkAndShowCashModal(order);
+
+                    // Deteksi perubahan status_pembayaran menjadi 'paid' (hanya sekali)
+                    if (previousPaymentStatus !== 'paid' && order.status_pembayaran === 'paid') {
+                        showStrukModal(orderId);
+                    }
+                    previousPaymentStatus = order.status_pembayaran;
 
                     // Invoice tag
                     document.getElementById('invoice-tag').innerText = order.invoice || `#${orderId}`;
@@ -562,10 +776,10 @@ if (!$order_id) {
                     const detail = document.getElementById('order-detail');
                     detail.style.display = 'block';
                     document.getElementById('detail-rows').innerHTML = `
-                    <div class="detail-row"><span class="lbl">Nama</span><span class="val">${order.nama_pelanggan}</span></div>
-                    <div class="detail-row"><span class="lbl">Meja</span><span class="val">🪑 ${order.nomor_meja || '-'}</span></div>
-                    <div class="detail-row"><span class="lbl">Metode</span><span class="val">${order.metode_pembayaran || '-'}</span></div>
-                    <div class="detail-row total-row"><span class="lbl">Total</span><span class="val">Rp ${fmt(order.total)}</span></div>`;
+            <div class="detail-row"><span class="lbl">Nama</span><span class="val">${order.nama_pelanggan}</span></div>
+            <div class="detail-row"><span class="lbl">Meja</span><span class="val">🪑 ${order.nomor_meja || '-'}</span></div>
+            <div class="detail-row"><span class="lbl">Metode</span><span class="val">${order.metode_pembayaran || '-'}</span></div>
+            <div class="detail-row total-row"><span class="lbl">Total</span><span class="val">Rp ${fmt(order.total)}</span></div>`;
 
                     const itemList = document.getElementById('items-list');
                     if (order.items && order.items.length) {
@@ -573,14 +787,36 @@ if (!$order_id) {
                             `<li><span>${it.nama_menu}</span><span>×${it.quantity}</span></li>`).join('');
                     }
 
-                    // Actions
+                    // Actions - dengan notifikasi khusus cash pending
                     const actions = document.getElementById('actions-area');
                     if (order.status_pembayaran === 'paid' || order.status_pesanan === 'selesai') {
                         actions.innerHTML = `
-                        <a href="struk.php?order_id=${orderId}" class="btn-struk" target="_blank">🧾 Lihat Struk</a>
-                        <a href="menu.php" class="btn-secondary">☕ Pesan Lagi</a>`;
+                <a href="struk.php?order_id=${orderId}" class="btn-struk" target="_blank">🧾 Lihat Struk</a>
+                <a href="menu.php" class="btn-secondary">☕ Pesan Lagi</a>`;
                     } else {
-                        actions.innerHTML = `<div class="waiting-msg"><span class="refresh-dot"></span> Memperbarui otomatis setiap 5 detik…</div>`;
+                        // Status masih pending
+                        let pesanPending = '';
+                        if (order.metode_pembayaran === 'cash') {
+                            pesanPending = `
+                        <div style="background: rgba(224,112,112,0.12); border: 1px solid rgba(224,112,112,0.3); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                            <div style="font-size: 14px; font-weight: bold; color: #e07070;">💵 Pembayaran Cash</div>
+                            <div style="font-size: 13px; color: var(--cream-dim); margin-top: 6px;">
+                                Silakan datang ke <strong>kasir</strong> untuk melakukan pembayaran dan konfirmasi.
+                                Setelah itu, struk akan tersedia di sini.
+                            </div>
+                        </div>
+                    `;
+                        } else {
+                            pesanPending = `
+                        <div style="background: rgba(201,160,80,0.08); border: 1px solid rgba(201,160,80,0.2); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                            <div style="font-size: 14px; font-weight: bold; color: var(--gold);">⏳ Menunggu Konfirmasi</div>
+                            <div style="font-size: 13px; color: var(--cream-dim); margin-top: 6px;">
+                                Pembayaran Anda sedang menunggu konfirmasi dari kasir. Struk akan muncul setelah dikonfirmasi.
+                            </div>
+                        </div>
+                    `;
+                        }
+                        actions.innerHTML = pesanPending + `<div class="waiting-msg"><span class="refresh-dot"></span> Halaman akan otomatis diperbarui setiap 5 detik…</div>`;
                     }
                 });
         }
@@ -588,6 +824,7 @@ if (!$order_id) {
         fetchStatus();
         setInterval(fetchStatus, 5000);
     </script>
+
 </body>
 
 </html>

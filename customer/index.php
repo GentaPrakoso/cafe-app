@@ -510,6 +510,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a>
         <ul class="nav-links">
             <li><a href="menu.php">Menu</a></li>
+            <li><a href="tracking_last.php">Lacak Pesanan</a></li>
+            <li><a href="history.php">History</a></li>
             <li><a href="cart.php">Keranjang 🛒</a></li>
         </ul>
     </nav>
